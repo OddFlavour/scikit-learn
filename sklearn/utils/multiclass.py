@@ -266,7 +266,12 @@ def type_of_target(y):
     with warnings.catch_warnings():
         warnings.simplefilter('error', np.VisibleDeprecationWarning)
         try:
-            y = np.asarray(y)
+            # For sparse matrices (identified by classes in scipy.sparse), the matrices are compressed
+            # This will require the matrices to be uncompressed before any further operations
+            if not issparse(y):
+                y = np.asarray(y)
+            else:
+                y = np.asarray(y.toarray())
         except np.VisibleDeprecationWarning:
             # dtype=object should be provided explicitly for ragged arrays,
             # see NEP 34
